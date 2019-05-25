@@ -1,6 +1,6 @@
 # coding=utf-8
 from main import main
-import os
+import args
 
 if __name__ == "__main__":
 
@@ -23,28 +23,23 @@ if __name__ == "__main__":
     from Processors.Yelp2Processor import Yelp2Processor
 
     if model_name == "BertOrigin":
-        from BertOrigin import args
+        main(args.get_args(model_name, data_dir, output_dir, cache_dir, log_dir ,bert_vocab_file, bert_model_dir),
 
-        main(args.get_args(data_dir, output_dir, cache_dir, bert_vocab_file, bert_model_dir, log_dir),
              model_times, Yelp2Processor)
     elif model_name == "BertCNN":
-        from BertCNN import args
+        from BertCNN import args_model
 
-        main(args.get_args(data_dir, output_dir, cache_dir, bert_vocab_file, bert_model_dir, log_dir),
-             model_times, Yelp2Processor)
+        main(args.get_args(model_name, data_dir, output_dir, cache_dir, log_dir, bert_vocab_file, bert_model_dir),
+             model_times, Yelp2Processor, args_model.get_args())
     elif model_name == "BertATT":
-        from BertATT import args
 
-        main(args.get_args(data_dir, output_dir, cache_dir, bert_vocab_file, bert_model_dir, log_dir),
+        main(args.get_args(model_name, data_dir, output_dir, cache_dir, log_dir, bert_vocab_file, bert_model_dir),
              model_times, Yelp2Processor)
     elif model_name == "BertRCNN":
-        from BertRCNN import args
 
-        main(args.get_args(data_dir, output_dir, cache_dir, bert_vocab_file, bert_model_dir, log_dir),
+        main(args.get_args(model_name, data_dir, output_dir, cache_dir, log_dir, bert_vocab_file, bert_model_dir),
              model_times, Yelp2Processor)
     elif model_name == "BertRNNCNN":
-        from BertRNNCNN import args
 
-        main(args.get_args(data_dir, output_dir, cache_dir, bert_vocab_file, bert_model_dir, log_dir,
-                           do_train, do_test),
+        main(args.get_args(model_name, data_dir, output_dir, cache_dir, log_dir, bert_vocab_file, bert_model_dir),
              model_times, Yelp2Processor)

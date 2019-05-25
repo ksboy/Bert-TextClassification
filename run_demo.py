@@ -19,7 +19,8 @@ if __name__ == "__main__":
     from Processors.DemoProcessor import DemoProcessor
 
     if model_name == "BertOrigin":
-        from BertOrigin import args
+        import args
+
         main(
             args.get_args(data_dir, output_dir, cache_dir,
                           bert_vocab_file, bert_model_dir, log_dir), 

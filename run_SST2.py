@@ -19,10 +19,11 @@ if __name__ == "__main__":
     from Processors.SST2Processor import Sst2Processor
 
     if model_name == "BertOrigin":
-        from BertOrigin import args
+        import args
+
         main(
-            args.get_args(data_dir, output_dir, cache_dir, 
-            bert_vocab_file, bert_model_dir, log_dir), model_times, Sst2Processor)
+            args.get_args(data_dir, output_dir, cache_dir,
+                          bert_vocab_file, bert_model_dir, log_dir), model_times, Sst2Processor)
     
     elif model_name == "BertCNN":
         from BertCNN import args

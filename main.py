@@ -19,7 +19,7 @@ from Utils.Classifier_utils import load_data
 from Utils.train_evalute import train, evaluate
 
 
-def main(config, model_times, myProcessor):
+def main(config,model_times, myProcessor, model_config = None):
     # print(os.path.join(config.output_dir, model_times))
     if not os.path.exists(os.path.join(config.output_dir , model_times)):
         os.makedirs(os.path.join(config.output_dir , model_times))
@@ -74,10 +74,10 @@ def main(config, model_times, myProcessor):
                 config.bert_model_dir, cache_dir=config.cache_dir, num_labels=num_labels)
         elif config.model_name == "BertCNN":
             from BertCNN.BertCNN import BertCNN
-            filter_sizes = [int(val) for val in config.filter_sizes.split()]
+            filter_sizes = [int(val) for val in model_config.filter_sizes.split()]
             model = BertCNN.from_pretrained(
                 config.bert_model_dir, cache_dir=config.cache_dir, num_labels=num_labels, 
-                n_filters=config.filter_num, filter_sizes=filter_sizes)
+                n_filters=model_config.filter_num, filter_sizes=filter_sizes)
         elif config.model_name == "BertATT":
             from BertATT.BertATT import BertATT
             model = BertATT.from_pretrained(
@@ -116,7 +116,7 @@ def main(config, model_times, myProcessor):
         criterion = criterion.to(device)
 
         train(config.num_train_epochs, n_gpu, model, train_dataloader, dev_dataloader, optimizer,
-              criterion, config.gradient_accumulation_steps, device, label_list, output_model_file, output_config_file, config.log_dir, config.print_step, config.early_stop)
+              criterion, config.gradient_accumulation_steps, device, label_list, output_model_file, output_config_file, config.log_dir, config.eval_every, config.early_stop)
 
     if True:
         """ Test """

@@ -9,9 +9,9 @@ import time
 from .utils import classifiction_metric
 
 
-def train(epoch_num, n_gpu, model, train_dataloader, dev_dataloader, 
-optimizer, criterion, gradient_accumulation_steps, device, label_list, 
-output_model_file, output_config_file, log_dir, print_step, early_stop):
+def train(epoch_num, n_gpu, model, train_dataloader, dev_dataloader,
+          optimizer, criterion, gradient_accumulation_steps, device, label_list,
+          output_model_file, output_config_file, log_dir, eval_every, early_stop, max_to_keep):
 
     model.train()
 
@@ -67,7 +67,7 @@ output_model_file, output_config_file, log_dir, print_step, early_stop):
                 optimizer.zero_grad()
                 global_step += 1
             
-            if global_step % print_step == 0:
+            if global_step % eval_every == 0:
 
                 """ 打印Train此时的信息 """
                 train_loss = epoch_loss / train_steps
@@ -75,7 +75,7 @@ output_model_file, output_config_file, log_dir, print_step, early_stop):
 
                 dev_loss, dev_acc, dev_report, dev_auc = evaluate(model, dev_dataloader, criterion, device, label_list)
 
-                c = global_step // print_step
+                c = global_step // eval_every
                 writer.add_scalar("loss/train", train_loss, c)
                 writer.add_scalar("loss/dev", dev_loss, c)
 

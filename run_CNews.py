@@ -1,6 +1,5 @@
 # coding=utf-8
 from main import main
-from BertOrigin import args
 
 if __name__ == "__main__":
 
