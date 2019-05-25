@@ -11,7 +11,7 @@ def get_args():
     #CNN 参数
     parser.add_argument("--filter_num", default=200,
                         type=int, help="filter 的数量")
-    parser.add_argument("--filter_sizes", default="= 2 3 5",
+    parser.add_argument("--filter_sizes", default="2 3 5",
                         type=str, help="filter 的 size")
     
     config = parser.parse_args()
