@@ -20,15 +20,15 @@ from Utils.train_evalute import train, evaluate
 
 
 def main(config, model_times, myProcessor):
+    # print(os.path.join(config.output_dir, model_times))
+    if not os.path.exists(os.path.join(config.output_dir , model_times)):
+        os.makedirs(os.path.join(config.output_dir , model_times))
 
-    if not os.path.exists(config.output_dir + model_times):
-        os.makedirs(config.output_dir + model_times)
-
-    if not os.path.exists(config.cache_dir + model_times):
-        os.makedirs(config.cache_dir + model_times)
+    if not os.path.exists(os.path.join(config.cache_dir , model_times)):
+        os.makedirs(os.path.join(config.cache_dir , model_times))
 
     output_model_file = os.path.join(config.output_dir, model_times, WEIGHTS_NAME)  # 模型输出文件
-    output_config_file = os.path.join(config.output_dir, model_times,CONFIG_NAME)
+    output_config_file = os.path.join(config.output_dir, model_times, CONFIG_NAME)
 
     gpu_ids = [int(device_id) for device_id in config.gpu_ids.split()]
 
@@ -56,7 +56,7 @@ def main(config, model_times, myProcessor):
     num_labels = len(label_list)
 
 
-    if config.do_train:
+    if True:
 
         train_dataloader, train_examples_len = load_data(
             config.data_dir, tokenizer, processor, config.max_seq_length, config.train_batch_size, "train")
@@ -82,10 +82,13 @@ def main(config, model_times, myProcessor):
             from BertATT.BertATT import BertATT
             model = BertATT.from_pretrained(
                 config.bert_model_dir, cache_dir=config.cache_dir, num_labels=num_labels)
-        
         elif config.model_name == "BertRCNN":
             from BertRCNN.BertRCNN import BertRCNN
             model = BertRCNN.from_pretrained(
+                config.bert_model_dir, cache_dir=config.cache_dir, num_labels=num_labels)
+        elif config.model_name == "BertRNNCNN":
+            from BertRCNN.BertRNNCNN import BertRNNCNN
+            model = BertRNNCNN.from_pretrained(
                 config.bert_model_dir, cache_dir=config.cache_dir, num_labels=num_labels)
 
         model.to(device)
@@ -115,46 +118,51 @@ def main(config, model_times, myProcessor):
         train(config.num_train_epochs, n_gpu, model, train_dataloader, dev_dataloader, optimizer,
               criterion, config.gradient_accumulation_steps, device, label_list, output_model_file, output_config_file, config.log_dir, config.print_step, config.early_stop)
 
-    """ Test """
-    test_dataloader, _ = load_data(
-        config.data_dir, tokenizer, processor, config.max_seq_length, config.test_batch_size, "test")
+    if True:
+        """ Test """
+        test_dataloader, _ = load_data(
+            config.data_dir, tokenizer, processor, config.max_seq_length, config.test_batch_size, "test")
 
-    bert_config = BertConfig(output_config_file)
-    if config.model_name == "BertOrigin":
-        from BertOrigin.BertOrigin import BertOrigin
-        model = BertOrigin(bert_config, num_labels=num_labels)
-    elif config.model_name == "BertCNN":
-        from BertCNN.BertCNN import BertCNN
-        filter_sizes = [int(val) for val in config.filter_sizes.split()]
-        model = BertCNN(bert_config, num_labels=num_labels,
-                        n_filters=config.filter_num, filter_sizes=filter_sizes)
-    elif config.model_name == "BertATT":
-        from BertATT.BertATT import BertATT
-        model = BertATT.from_pretrained(
-            config.bert_model_dir, cache_dir=config.cache_dir, num_labels=num_labels)
-    elif config.model_name == "BertRCNN":
-            from BertRCNN.BertRCNN import BertRCNN
-            model = BertRCNN.from_pretrained(
+        bert_config = BertConfig(output_config_file)
+        if config.model_name == "BertOrigin":
+            from BertOrigin.BertOrigin import BertOrigin
+            model = BertOrigin(bert_config, num_labels=num_labels)
+        elif config.model_name == "BertCNN":
+            from BertCNN.BertCNN import BertCNN
+            filter_sizes = [int(val) for val in config.filter_sizes.split()]
+            model = BertCNN(bert_config, num_labels=num_labels,
+                            n_filters=config.filter_num, filter_sizes=filter_sizes)
+        elif config.model_name == "BertATT":
+            from BertATT.BertATT import BertATT
+            model = BertATT.from_pretrained(
                 config.bert_model_dir, cache_dir=config.cache_dir, num_labels=num_labels)
+        elif config.model_name == "BertRCNN":
+                from BertRCNN.BertRCNN import BertRCNN
+                model = BertRCNN.from_pretrained(
+                    config.bert_model_dir, cache_dir=config.cache_dir, num_labels=num_labels)
+        elif config.model_name == "BertRNNCNN":
+                from BertRCNN.BertRNNCNN import BertRNNCNN
+                model = BertRNNCNN.from_pretrained(
+                    config.bert_model_dir, cache_dir=config.cache_dir, num_labels=num_labels)
 
-    model.load_state_dict(torch.load(output_model_file))
-    model.to(device)
+        model.load_state_dict(torch.load(output_model_file))
+        model.to(device)
 
-    """ 损失函数准备 """
-    criterion = nn.CrossEntropyLoss()
-    criterion = criterion.to(device)
+        """ 损失函数准备 """
+        criterion = nn.CrossEntropyLoss()
+        criterion = criterion.to(device)
 
-    # test the model
-    test_loss, test_acc, test_report, test_auc = evaluate(
-        model, test_dataloader, criterion, device, label_list)
-    print("-------------- Test -------------")
-    print(f'\t  Loss: {test_loss: .3f} | Acc: {test_acc*100: .3f} % | AUC:{test_auc}')
+        # test the model
+        test_loss, test_acc, test_report, test_auc = evaluate(
+            model, test_dataloader, criterion, device, label_list)
+        print("-------------- Test -------------")
+        print('\t  Loss: {test_loss: .3f} | Acc: {test_acc*100: .3f} % | AUC:{test_auc}')
 
-    for label in label_list:
-        print('\t {}: Precision: {} | recall: {} | f1 score: {}'.format(
-            label, test_report[label]['precision'], test_report[label]['recall'], test_report[label]['f1-score']))
-    print_list = ['macro avg', 'weighted avg']
+        for label in label_list:
+            print('\t {}: Precision: {} | recall: {} | f1 score: {}'.format(
+                label, test_report[label]['precision'], test_report[label]['recall'], test_report[label]['f1-score']))
+        print_list = ['macro avg', 'weighted avg']
 
-    for label in print_list:
-        print('\t {}: Precision: {} | recall: {} | f1 score: {}'.format(
-            label, test_report[label]['precision'], test_report[label]['recall'], test_report[label]['f1-score']))
+        for label in print_list:
+            print('\t {}: Precision: {} | recall: {} | f1 score: {}'.format(
+                label, test_report[label]['precision'], test_report[label]['recall'], test_report[label]['f1-score']))

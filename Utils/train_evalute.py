@@ -28,7 +28,7 @@ output_model_file, output_config_file, log_dir, print_step, early_stop):
         if early_stop_times >= early_stop:
             break
 
-        print(f'---------------- Epoch: {epoch+1:02} ----------')
+        print('---------------- Epoch: {epoch+1:02} ----------')
 
         epoch_loss = 0
 
