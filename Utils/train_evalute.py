@@ -11,7 +11,7 @@ from .utils import classifiction_metric
 
 def train(epoch_num, n_gpu, model, train_dataloader, dev_dataloader,
           optimizer, criterion, gradient_accumulation_steps, device, label_list,
-          output_model_file, output_config_file, log_dir, eval_every, early_stop, max_to_keep):
+          output_model_file, output_config_file, log_dir, eval_every, early_stop):
 
     model.train()
 
@@ -42,6 +42,8 @@ def train(epoch_num, n_gpu, model, train_dataloader, dev_dataloader,
             input_ids, input_mask, segment_ids, label_ids = batch
 
             logits = model(input_ids, segment_ids, input_mask, labels=None)
+            # writer.add_graph(model, (input_ids, segment_ids, input_mask, None, ))
+            # writer.close()
             loss = criterion(logits.view(-1, len(label_list)), label_ids.view(-1))
 
             """ 修正 loss """

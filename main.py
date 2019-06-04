@@ -129,9 +129,9 @@ def main(config,model_times, myProcessor, model_config = None):
             model = BertOrigin(bert_config, num_labels=num_labels)
         elif config.model_name == "BertCNN":
             from BertCNN.BertCNN import BertCNN
-            filter_sizes = [int(val) for val in config.filter_sizes.split()]
+            filter_sizes = [int(val) for val in model_config.filter_sizes.split()]
             model = BertCNN(bert_config, num_labels=num_labels,
-                            n_filters=config.filter_num, filter_sizes=filter_sizes)
+                            n_filters=model_config.filter_num, filter_sizes=filter_sizes)
         elif config.model_name == "BertATT":
             from BertATT.BertATT import BertATT
             model = BertATT.from_pretrained(

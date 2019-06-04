@@ -7,10 +7,11 @@ from torch import nn
 from torch.nn import CrossEntropyLoss
 import torch.nn.functional as F
 
-from Models.Conv import Conv1d
+from Models.LSTM import LSTM
 from Models.Linear import Linear
 
-class BertRNNCNN(BertPreTrainedModel):
+
+class BertRNN(BertPreTrainedModel):
     """BERT model for classification.
     This module is composed of the BERT model with a linear layer on top of
     the pooled output.
@@ -42,7 +43,7 @@ class BertRNNCNN(BertPreTrainedModel):
     """
 
     def __init__(self, config, num_labels, n_filters, filter_sizes):
-        super(BertRNNCNN, self).__init__(config)
+        super(BertCNN, self).__init__(config)
         self.num_labels = num_labels
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
@@ -55,9 +56,8 @@ class BertRNNCNN(BertPreTrainedModel):
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, labels=None):
         encoded_layers, _ = self.bert(
             input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
-        
-        encoded_layers = self.dropout(encoded_layers)
 
+        encoded_layers = self.dropout(encoded_layers)
 
         encoded_layers = encoded_layers.permute(0, 2, 1)
 
@@ -65,7 +65,7 @@ class BertRNNCNN(BertPreTrainedModel):
 
         pooled = [F.max_pool1d(conv, conv.shape[2]).squeeze(2)
                   for conv in conved]
-        
+
         cat = self.dropout(torch.cat(pooled, dim=1))
 
         logits = self.classifier(cat)
